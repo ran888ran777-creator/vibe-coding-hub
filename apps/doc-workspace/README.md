@@ -18,6 +18,7 @@ Production-minded MVP for document parsing on top of Firecrawl Document Parsing.
 4. Generate Prisma client: `npm run prisma:generate`
 5. Apply migrations: `npm run prisma:migrate`
 6. Start dev server: `npm run dev`
+7. Open `http://localhost:3000/auth/register` and create the first local account.
 
 ## Local MVP mode
 
@@ -29,4 +30,5 @@ Production-minded MVP for document parsing on top of Firecrawl Document Parsing.
 
 - File uploads require R2-compatible env vars.
 - URL parsing works as soon as `FIRECRAWL_API_KEY` is configured.
-- Auth is currently scaffolded with a single development user placeholder and should be replaced with Clerk or Supabase Auth before production launch.
+- Local auth uses password hashing plus a signed session cookie.
+- Parse and summary are queued into DB-backed background jobs and processed by the in-process runner in local mode.

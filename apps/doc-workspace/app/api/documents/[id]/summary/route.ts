@@ -1,15 +1,41 @@
 import { NextResponse } from "next/server";
-import { runSummarizeDocument } from "@/jobs/summarize-document";
+import { db } from "@/lib/db";
+import { requireCurrentUser, UnauthorizedError } from "@/lib/auth";
+import { enqueueDocumentJob } from "@/lib/jobs";
 
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireCurrentUser();
     const { id } = await params;
-    await runSummarizeDocument(id);
-    return NextResponse.json({ message: "Summary generated." });
+    const document = await db.document.findFirst({
+      where: {
+        id,
+        userId: user.id
+      },
+      select: { id: true, status: true }
+    });
+
+    if (!document) {
+      return NextResponse.json({ error: "Document not found." }, { status: 404 });
+    }
+
+    if (document.status !== "PARSED" && document.status !== "READY") {
+      return NextResponse.json(
+        { error: "Document must finish parsing before summary can be queued." },
+        { status: 409 }
+      );
+    }
+
+    const job = await enqueueDocumentJob(id, "SUMMARY");
+    return NextResponse.json({ message: "Summary job queued.", jobId: job.id }, { status: 202 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Summary failed." },
       { status: 500 }

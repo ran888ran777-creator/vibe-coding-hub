@@ -1,21 +1,29 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser, UnauthorizedError } from "@/lib/auth";
 import { uploadFileToStorage } from "@/lib/storage";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  const documents = await db.document.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" }
-  });
+  try {
+    const user = await requireCurrentUser();
+    const documents = await db.document.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" }
+    });
 
-  return NextResponse.json({ documents });
+    return NextResponse.json({ documents });
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: "Unable to fetch documents." }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
+    const user = await requireCurrentUser();
     const formData = await request.formData();
     const title = String(formData.get("title") ?? "");
     const sourceType = String(formData.get("sourceType") ?? "URL");
@@ -62,6 +70,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ document }, { status: 201 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unable to create document." },
       { status: 500 }

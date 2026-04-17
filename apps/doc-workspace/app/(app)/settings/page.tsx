@@ -1,8 +1,15 @@
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/auth/login");
+  }
+
   const configured = {
     firecrawl: Boolean(env.FIRECRAWL_API_KEY),
     openai: Boolean(env.OPENAI_API_KEY),
@@ -37,19 +44,19 @@ export default function SettingsPage() {
         </table>
       </article>
       <article>
-        <p className="eyebrow">Production note</p>
-        <h2>Replace dev auth before launch</h2>
+        <p className="eyebrow">Account</p>
+        <h2>Signed in as {user.email}</h2>
         <p>
-          The scaffold uses a single development user so the MVP can move immediately. Before production, swap this for
-          Clerk or Supabase Auth and scope every document query by the authenticated user.
+          Local auth is now cookie-backed with password hashing. For production, replace it only if you need SSO,
+          password reset, or organization-level controls.
         </p>
       </article>
       <article>
         <p className="eyebrow">Next step</p>
-        <h2>Move parse and summary into jobs</h2>
+        <h2>Background processing is DB-backed</h2>
         <p>
-          The route handlers call jobs directly right now. In production, route them through Inngest or Trigger.dev to
-          get retries, observability, and no long-running browser waits.
+          Parse and summary now enqueue jobs and return immediately. The current runner is in-process for local MVP
+          usage; replace it with Inngest or Trigger.dev if you need multi-instance reliability and retries.
         </p>
       </article>
     </main>

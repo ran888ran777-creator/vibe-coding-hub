@@ -127,6 +127,16 @@ textarea {
   font-weight: 700;
 }
 
+button {
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1.35fr 0.9fr;
@@ -185,6 +195,19 @@ textarea {
   align-items: center;
 }
 
+.nav-user {
+  align-self: center;
+}
+
+.auth-shell {
+  width: min(100%, 520px);
+  margin: 5rem auto 0;
+}
+
+.auth-panel {
+  padding: 1.4rem;
+}
+
 .field {
   display: grid;
   gap: 0.45rem;
@@ -228,6 +251,32 @@ textarea {
 }
 
 .status-failed {
+  color: var(--danger);
+}
+
+.job-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.job-row {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.job-running {
+  color: var(--accent);
+}
+
+.job-succeeded {
+  color: var(--success);
+}
+
+.job-failed {
   color: var(--danger);
 }
 

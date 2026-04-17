@@ -10,6 +10,7 @@ pagefind/
 .env
 .env.*
 !.env.example
+.local-storage/
 
 # Windows
 Thumbs.db

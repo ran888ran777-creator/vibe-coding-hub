@@ -13,21 +13,35 @@ export async function runSummarizeDocument(documentId: string) {
 
   await db.document.update({
     where: { id: documentId },
-    data: { status: "SUMMARIZING" }
-  });
-
-  const summary = await generateSummary(document.parse.markdown);
-
-  await db.documentSummary.create({
     data: {
-      documentId,
-      kind: "OVERVIEW",
-      content: summary
+      status: "SUMMARIZING",
+      lastError: null
     }
   });
 
-  await db.document.update({
-    where: { id: documentId },
-    data: { status: "READY" }
-  });
+  try {
+    const summary = await generateSummary(document.parse.markdown);
+
+    await db.documentSummary.create({
+      data: {
+        documentId,
+        kind: "OVERVIEW",
+        content: summary
+      }
+    });
+
+    await db.document.update({
+      where: { id: documentId },
+      data: { status: "READY" }
+    });
+  } catch (error) {
+    await db.document.update({
+      where: { id: documentId },
+      data: {
+        status: "FAILED",
+        lastError: error instanceof Error ? error.message : "Unknown summary error"
+      }
+    });
+    throw error;
+  }
 }

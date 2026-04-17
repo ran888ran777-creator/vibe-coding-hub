@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function AskForm({ documentId }: { documentId: string }) {
+export function AskForm({ documentId, disabled = false }: { documentId: string; disabled?: boolean }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -43,15 +43,17 @@ export function AskForm({ documentId }: { documentId: string }) {
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
+            disabled={disabled}
             rows={5}
             placeholder="What are the deadlines, obligations, owners, or key decisions?"
           />
         </label>
-        <button className="primary-button" disabled={busy || question.length < 3} type="submit">
-          {busy ? "Thinking…" : "Ask"}
+        <button className="primary-button" disabled={disabled || busy || question.length < 3} type="submit">
+          {busy ? "Thinking..." : "Ask"}
         </button>
       </form>
 
+      {disabled ? <p className="muted-note">Wait until parsing and summary complete before asking questions.</p> : null}
       {error ? <p className="error-text">{error}</p> : null}
       {answer ? <pre className="answer-box">{answer}</pre> : null}
     </div>

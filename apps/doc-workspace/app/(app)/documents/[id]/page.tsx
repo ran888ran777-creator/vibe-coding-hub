@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import { StatusBadge } from "@/components/document/status-badge";
 import { DocumentActions } from "@/components/document/document-actions";
 import { AskForm } from "@/components/document/ask-form";
@@ -12,12 +13,25 @@ export default async function DocumentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const document = await db.document.findUnique({
-    where: { id },
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const document = await db.document.findFirst({
+    where: {
+      id,
+      userId: user.id
+    },
     include: {
       parse: true,
       summaries: {
         orderBy: { createdAt: "desc" }
+      },
+      jobs: {
+        orderBy: { createdAt: "desc" },
+        take: 6
       }
     }
   });
@@ -53,7 +67,7 @@ export default async function DocumentDetailPage({
         </section>
 
         <section className="summary-grid">
-          <DocumentActions documentId={document.id} />
+          <DocumentActions documentId={document.id} status={document.status} />
           <div className="panel">
             <p className="eyebrow">Overview</p>
             {latestSummary ? <pre className="answer-box">{latestSummary}</pre> : <p className="muted-note">No summary yet.</p>}
@@ -70,10 +84,26 @@ export default async function DocumentDetailPage({
               <p className="muted-note">No extracted tables available.</p>
             )}
           </div>
+          <div className="panel">
+            <p className="eyebrow">Recent jobs</p>
+            {document.jobs.length > 0 ? (
+              <div className="job-list">
+                {document.jobs.map((job) => (
+                  <div className="job-row" key={job.id}>
+                    <strong>{job.type}</strong>
+                    <span className={`meta job-status job-${job.status.toLowerCase()}`}>{job.status}</span>
+                    {job.lastError ? <span className="error-text">{job.lastError}</span> : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="muted-note">No jobs queued yet.</p>
+            )}
+          </div>
         </section>
       </div>
 
-      <AskForm documentId={document.id} />
+      <AskForm documentId={document.id} disabled={document.status !== "READY"} />
     </main>
   );
 }

@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id         String     @id @default(cuid())
-  email      String     @unique
-  name       String?
-  documents  Document[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  passwordHash String?
+  documents    Document[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Document {
@@ -34,6 +35,7 @@ model Document {
   summaries      DocumentSummary[]
   exports        DocumentExport[]
   qaMessages     DocumentQAMessage[]
+  jobs           DocumentJob[]
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
@@ -85,6 +87,24 @@ model DocumentQAMessage {
   @@index([documentId, createdAt])
 }
 
+model DocumentJob {
+  id         String            @id @default(cuid())
+  documentId String
+  type       DocumentJobType
+  status     DocumentJobStatus @default(PENDING)
+  attempts   Int               @default(0)
+  payloadJson Json?
+  lastError  String?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  document   Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, createdAt])
+  @@index([status, createdAt])
+}
+
 enum DocumentStatus {
   UPLOADED
   PARSING
@@ -113,4 +133,16 @@ enum ExportFormat {
 enum MessageRole {
   USER
   ASSISTANT
+}
+
+enum DocumentJobType {
+  PARSE
+  SUMMARY
+}
+
+enum DocumentJobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
 }

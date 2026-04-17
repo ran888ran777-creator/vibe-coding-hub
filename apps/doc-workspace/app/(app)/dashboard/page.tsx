@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { StatusBadge } from "@/components/document/status-badge";
@@ -7,6 +8,10 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
+  if (!user) {
+    redirect("/auth/login");
+  }
+
   const documents = await db.document.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" }
@@ -17,7 +22,7 @@ export default async function DashboardPage() {
       <div className="cta-row">
         <div>
           <p className="eyebrow">Dashboard</p>
-          <h1>Your documents</h1>
+          <h1>{user.name ? `${user.name}'s documents` : "Your documents"}</h1>
         </div>
         <Link className="primary-button" href="/documents/new">
           New document

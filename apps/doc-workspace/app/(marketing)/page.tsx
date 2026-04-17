@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 
-export default function MarketingPage() {
+export default async function MarketingPage() {
+  const user = await getCurrentUser();
+
   return (
     <main>
       <section className="hero">
@@ -12,23 +15,36 @@ export default function MarketingPage() {
             extract key facts, and export clean artifacts for downstream work.
           </p>
           <div className="cta-row">
-            <Link className="primary-button" href="/documents/new">
-              Create first document
-            </Link>
-            <Link className="ghost-button" href="/dashboard">
-              Open dashboard
-            </Link>
+            {user ? (
+              <>
+                <Link className="primary-button" href="/documents/new">
+                  Create first document
+                </Link>
+                <Link className="ghost-button" href="/dashboard">
+                  Open dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="primary-button" href="/auth/register">
+                  Create workspace account
+                </Link>
+                <Link className="ghost-button" href="/auth/login">
+                  Sign in
+                </Link>
+              </>
+            )}
           </div>
         </div>
         <div className="hero-side">
           <div className="panel">
             <p className="eyebrow">Core loop</p>
-            <h2>Upload → Parse → Summarize → Export</h2>
+            <h2>Upload - Parse - Summarize - Export</h2>
             <p>Built for finance packs, tenders, policies, contracts, and internal operations docs.</p>
           </div>
           <div className="panel">
             <p className="eyebrow">Production-minded MVP</p>
-            <p>Next.js, Prisma, R2-compatible storage, Firecrawl parsing, and OpenAI review layered on top.</p>
+            <p>Next.js, Prisma, DB-backed jobs, R2-compatible storage, Firecrawl parsing, and OpenAI review.</p>
           </div>
         </div>
       </section>
@@ -44,7 +60,7 @@ export default function MarketingPage() {
         </article>
         <article>
           <h2>Operational clarity</h2>
-          <p>Every document has a source, status, export history, and failure reason instead of hidden magic.</p>
+          <p>Every document has a source, status, queued jobs, export history, and failure reason.</p>
         </article>
       </section>
     </main>
