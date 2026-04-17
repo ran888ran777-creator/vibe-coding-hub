@@ -2,17 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getMessages, type Locale } from "@/lib/i18n";
 
 type DocumentStatusValue = "UPLOADED" | "PARSING" | "PARSED" | "SUMMARIZING" | "READY" | "FAILED";
 
 export function DocumentActions({
   documentId,
+  locale,
   status
 }: {
   documentId: string;
+  locale: Locale;
   status: DocumentStatusValue;
 }) {
   const router = useRouter();
+  const t = getMessages(locale);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -66,10 +70,7 @@ export function DocumentActions({
         link.click();
       }
 
-      setMessage(
-        payload.message ??
-          (action === "parse" || action === "summary" ? "Job queued." : "Done.")
-      );
+      setMessage(payload.message ?? (action === "parse" || action === "summary" ? "Job queued." : "Done."));
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unknown action error.");
@@ -82,19 +83,19 @@ export function DocumentActions({
     <div className="panel">
       <div className="action-grid">
         <button onClick={() => runAction("parse")} disabled={busyAction !== null || status === "PARSING"}>
-          {busyAction === "parse" ? "Queueing..." : "Run parse"}
+          {busyAction === "parse" ? t.actions.queueing : t.actions.runParse}
         </button>
         <button
           onClick={() => runAction("summary")}
           disabled={busyAction !== null || (status !== "PARSED" && status !== "READY")}
         >
-          {busyAction === "summary" ? "Queueing..." : "Generate summary"}
+          {busyAction === "summary" ? t.actions.queueing : t.actions.generateSummary}
         </button>
         <button onClick={() => runAction("export-markdown")} disabled={busyAction !== null || status === "UPLOADED"}>
-          Export .md
+          {t.actions.exportMd}
         </button>
         <button onClick={() => runAction("export-json")} disabled={busyAction !== null || status === "UPLOADED"}>
-          Export .json
+          {t.actions.exportJson}
         </button>
       </div>
       {message ? <p className="muted-note">{message}</p> : null}

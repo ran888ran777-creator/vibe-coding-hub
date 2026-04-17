@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getMessages, type Locale } from "@/lib/i18n";
 
-export function LogoutButton() {
+export function LogoutButton({ locale }: { locale: Locale }) {
   const router = useRouter();
+  const t = getMessages(locale);
   const [busy, setBusy] = useState(false);
 
   async function handleLogout() {
@@ -23,7 +25,7 @@ export function LogoutButton() {
 
   return (
     <button className="ghost-button" disabled={busy} onClick={handleLogout} type="button">
-      {busy ? "Signing out..." : "Sign out"}
+      {busy ? t.logout.signingOut : t.logout.signOut}
     </button>
   );
 }

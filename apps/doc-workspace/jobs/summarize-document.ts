@@ -7,7 +7,9 @@ export async function runSummarizeDocument(documentId: string) {
     include: { parse: true }
   });
 
-  if (!document?.parse?.markdown) {
+  const sourceMarkdown = document?.parse?.cleanedMarkdown ?? document?.parse?.markdown;
+
+  if (!sourceMarkdown) {
     throw new Error("Parsed markdown is required before summarizing.");
   }
 
@@ -20,7 +22,7 @@ export async function runSummarizeDocument(documentId: string) {
   });
 
   try {
-    const summary = await generateSummary(document.parse.markdown);
+    const summary = await generateSummary(sourceMarkdown);
 
     await db.documentSummary.create({
       data: {

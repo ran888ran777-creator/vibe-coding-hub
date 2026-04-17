@@ -23,6 +23,7 @@ model Document {
   title          String
   status         DocumentStatus     @default(UPLOADED)
   sourceType     DocumentSourceType
+  pdfParseMode   PdfParseMode       @default(AUTO)
   mimeType       String?
   originalName   String?
   externalUrl    String?
@@ -48,6 +49,7 @@ model DocumentParse {
   documentId   String    @unique
   rawJson      Json
   markdown     String?
+  cleanedMarkdown String?
   metadataJson Json?
   tablesJson   Json?
   language     String?
@@ -117,6 +119,12 @@ enum DocumentStatus {
 enum DocumentSourceType {
   FILE
   URL
+}
+
+enum PdfParseMode {
+  AUTO
+  OCR
+  FAST
 }
 
 enum SummaryKind {

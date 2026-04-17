@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const title = String(formData.get("title") ?? "");
     const sourceType = String(formData.get("sourceType") ?? "URL");
+    const pdfParseMode = String(formData.get("pdfParseMode") ?? "AUTO");
 
     if (!title) {
       return NextResponse.json({ error: "Title is required." }, { status: 400 });
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
         title,
         status: "UPLOADED",
         sourceType: sourceType === "FILE" ? "FILE" : "URL",
+        pdfParseMode: pdfParseMode === "OCR" ? "OCR" : pdfParseMode === "FAST" ? "FAST" : "AUTO",
         externalUrl,
         storageKey,
         originalName,

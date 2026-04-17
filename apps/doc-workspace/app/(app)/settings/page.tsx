@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { getCurrentMessages } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
+  const { t } = await getCurrentMessages();
+
   if (!user) {
     redirect("/auth/login");
   }
@@ -20,44 +23,40 @@ export default async function SettingsPage() {
   return (
     <main className="section-grid">
       <article>
-        <p className="eyebrow">Environment</p>
-        <h2>Configured providers</h2>
+        <p className="eyebrow">{t.settings.environment}</p>
+        <h2>{t.settings.configuredProviders}</h2>
         <table>
           <tbody>
             <tr>
-              <th>Database</th>
-              <td>{configured.database ? "Connected" : "Missing DATABASE_URL"}</td>
+              <th>{t.settings.database}</th>
+              <td>{configured.database ? t.settings.connected : t.settings.missingDatabase}</td>
             </tr>
             <tr>
-              <th>Firecrawl</th>
-              <td>{configured.firecrawl ? "Configured" : "Missing FIRECRAWL_API_KEY"}</td>
+              <th>{t.settings.firecrawl}</th>
+              <td>{configured.firecrawl ? t.settings.configured : t.settings.missingFirecrawl}</td>
             </tr>
             <tr>
-              <th>OpenAI</th>
-              <td>{configured.openai ? "Configured" : "Missing OPENAI_API_KEY"}</td>
+              <th>{t.settings.openai}</th>
+              <td>{configured.openai ? t.settings.configured : t.settings.missingOpenai}</td>
             </tr>
             <tr>
-              <th>Storage</th>
-              <td>{configured.storage ? "Configured" : "Missing R2_* env vars"}</td>
+              <th>{t.settings.storage}</th>
+              <td>{configured.storage ? t.settings.configured : t.settings.missingStorage}</td>
             </tr>
           </tbody>
         </table>
       </article>
       <article>
-        <p className="eyebrow">Account</p>
-        <h2>Signed in as {user.email}</h2>
-        <p>
-          Local auth is now cookie-backed with password hashing. For production, replace it only if you need SSO,
-          password reset, or organization-level controls.
-        </p>
+        <p className="eyebrow">{t.settings.account}</p>
+        <h2>
+          {t.settings.signedInAs} {user.email}
+        </h2>
+        <p>{t.settings.accountBody}</p>
       </article>
       <article>
-        <p className="eyebrow">Next step</p>
-        <h2>Background processing is DB-backed</h2>
-        <p>
-          Parse and summary now enqueue jobs and return immediately. The current runner is in-process for local MVP
-          usage; replace it with Inngest or Trigger.dev if you need multi-instance reliability and retries.
-        </p>
+        <p className="eyebrow">{t.settings.nextStep}</p>
+        <h2>{t.settings.jobsTitle}</h2>
+        <p>{t.settings.jobsBody}</p>
       </article>
     </main>
   );

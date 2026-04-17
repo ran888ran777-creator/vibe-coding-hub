@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getMessages, type Locale } from "@/lib/i18n";
 
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
+export function AuthForm({ mode, locale }: { mode: "login" | "register"; locale: Locale }) {
   const router = useRouter();
+  const t = getMessages(locale);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,44 +48,35 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
 
   return (
     <form className="panel form-panel auth-panel" onSubmit={handleSubmit}>
-      <p className="eyebrow">{mode === "login" ? "Welcome back" : "Create account"}</p>
-      <h1>{mode === "login" ? "Sign in" : "Register"}</h1>
-      <p className="muted-note">
-        {mode === "login"
-          ? "Use your workspace credentials to continue."
-          : "Create a local account for this Doc Workspace instance."}
-      </p>
+      <p className="eyebrow">{mode === "login" ? t.auth.welcomeBack : t.auth.createAccount}</p>
+      <h1>{mode === "login" ? t.auth.signIn : t.auth.register}</h1>
+      <p className="muted-note">{mode === "login" ? t.auth.useCredentials : t.auth.createLocalAccount}</p>
 
       {mode === "register" ? (
         <label className="field">
-          <span>Name</span>
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Founding operator"
-            required
-          />
+          <span>{t.auth.name}</span>
+          <input value={name} onChange={(event) => setName(event.target.value)} placeholder={t.auth.namePlaceholder} required />
         </label>
       ) : null}
 
       <label className="field">
-        <span>Email</span>
+        <span>{t.auth.email}</span>
         <input
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
+          placeholder={t.auth.emailPlaceholder}
           required
           type="email"
         />
       </label>
 
       <label className="field">
-        <span>Password</span>
+        <span>{t.auth.password}</span>
         <input
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           minLength={8}
-          placeholder="Minimum 8 characters"
+          placeholder={t.auth.passwordPlaceholder}
           required
           type="password"
         />
@@ -92,13 +85,13 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       {error ? <p className="error-text">{error}</p> : null}
 
       <button className="primary-button" disabled={submitting} type="submit">
-        {submitting ? "Working..." : mode === "login" ? "Sign in" : "Create account"}
+        {submitting ? t.auth.working : mode === "login" ? t.auth.signIn : t.auth.createAccount}
       </button>
 
       <p className="muted-note">
-        {mode === "login" ? "Need an account?" : "Already have an account?"}{" "}
+        {mode === "login" ? t.auth.needAccount : t.auth.haveAccount}{" "}
         <Link href={mode === "login" ? "/auth/register" : "/auth/login"}>
-          {mode === "login" ? "Register" : "Sign in"}
+          {mode === "login" ? t.auth.register : t.auth.signIn}
         </Link>
       </p>
     </form>

@@ -20,11 +20,13 @@ export async function POST(
       include: { parse: true }
     });
 
-    if (!document?.parse?.markdown) {
+    const sourceMarkdown = document?.parse?.cleanedMarkdown ?? document?.parse?.markdown;
+
+    if (!sourceMarkdown) {
       return NextResponse.json({ error: "Document must be parsed before Q&A." }, { status: 400 });
     }
 
-    const answer = await answerQuestion(document.parse.markdown, body.question);
+    const answer = await answerQuestion(sourceMarkdown, body.question);
 
     await db.documentQAMessage.createMany({
       data: [

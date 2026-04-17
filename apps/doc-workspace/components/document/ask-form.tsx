@@ -1,8 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { getMessages, type Locale } from "@/lib/i18n";
 
-export function AskForm({ documentId, disabled = false }: { documentId: string; disabled?: boolean }) {
+export function AskForm({
+  documentId,
+  locale,
+  disabled = false
+}: {
+  documentId: string;
+  locale: Locale;
+  disabled?: boolean;
+}) {
+  const t = getMessages(locale);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -39,21 +49,21 @@ export function AskForm({ documentId, disabled = false }: { documentId: string; 
     <div className="panel">
       <form className="ask-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Ask the document</span>
+          <span>{t.actions.askDocument}</span>
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             disabled={disabled}
             rows={5}
-            placeholder="What are the deadlines, obligations, owners, or key decisions?"
+            placeholder={t.actions.askPlaceholder}
           />
         </label>
         <button className="primary-button" disabled={disabled || busy || question.length < 3} type="submit">
-          {busy ? "Thinking..." : "Ask"}
+          {busy ? t.actions.thinking : t.actions.ask}
         </button>
       </form>
 
-      {disabled ? <p className="muted-note">Wait until parsing and summary complete before asking questions.</p> : null}
+      {disabled ? <p className="muted-note">{t.actions.waitUntilReady}</p> : null}
       {error ? <p className="error-text">{error}</p> : null}
       {answer ? <pre className="answer-box">{answer}</pre> : null}
     </div>

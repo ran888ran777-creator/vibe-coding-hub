@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth/auth-form";
 import { getCurrentUser } from "@/lib/auth";
+import { getCurrentLocale } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
   const user = await getCurrentUser();
+  const locale = await getCurrentLocale();
 
   if (user) {
     redirect("/dashboard");
@@ -13,7 +15,7 @@ export default async function RegisterPage() {
 
   return (
     <main className="auth-shell">
-      <AuthForm mode="register" />
+      <AuthForm locale={locale} mode="register" />
     </main>
   );
 }

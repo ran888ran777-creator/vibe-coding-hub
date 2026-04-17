@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { parseDocumentFromUrl } from "@/lib/firecrawl";
+import { cleanParsedMarkdown } from "@/lib/ocr";
 
 function toJsonValue(value: unknown) {
   return JSON.parse(JSON.stringify(value)) as any;
@@ -21,13 +22,19 @@ export async function runParseDocument(documentId: string) {
   });
 
   try {
-    const parsed = await parseDocumentFromUrl(document.externalUrl, document.mimeType ?? undefined);
+    const parsed = await parseDocumentFromUrl(
+      document.externalUrl,
+      document.mimeType ?? undefined,
+      document.pdfParseMode
+    );
+    const cleanedMarkdown = cleanParsedMarkdown(parsed.markdown);
 
     await db.documentParse.upsert({
       where: { documentId },
       update: {
         rawJson: toJsonValue(parsed.raw),
         markdown: parsed.markdown,
+        cleanedMarkdown,
         metadataJson: toJsonValue(parsed.metadata),
         tablesJson: toJsonValue(parsed.tables),
         parsedAt: new Date()
@@ -36,10 +43,19 @@ export async function runParseDocument(documentId: string) {
         documentId,
         rawJson: toJsonValue(parsed.raw),
         markdown: parsed.markdown,
+        cleanedMarkdown,
         metadataJson: toJsonValue(parsed.metadata),
         tablesJson: toJsonValue(parsed.tables),
         parsedAt: new Date()
       }
+    });
+
+    await db.documentSummary.deleteMany({
+      where: { documentId }
+    });
+
+    await db.documentQAMessage.deleteMany({
+      where: { documentId }
     });
 
     await db.document.update({

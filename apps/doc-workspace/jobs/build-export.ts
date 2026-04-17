@@ -14,17 +14,18 @@ export async function runBuildExport(documentId: string, format: "MARKDOWN" | "J
     throw new Error("Document parse is missing.");
   }
 
+  const sourceMarkdown = document.parse.cleanedMarkdown ?? document.parse.markdown ?? "";
   const summary = document.summaries.at(-1)?.content;
   const payload =
     format === "MARKDOWN"
       ? buildMarkdownExport({
           title: document.title,
-          markdown: document.parse.markdown ?? "",
+          markdown: sourceMarkdown,
           summary
         })
       : buildJsonExport({
           title: document.title,
-          markdown: document.parse.markdown ?? "",
+          markdown: sourceMarkdown,
           metadata: document.parse.metadataJson ?? {},
           tables: document.parse.tablesJson ?? [],
           summary

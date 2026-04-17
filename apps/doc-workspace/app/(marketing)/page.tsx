@@ -1,36 +1,35 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { getCurrentMessages } from "@/lib/i18n-server";
 
 export default async function MarketingPage() {
   const user = await getCurrentUser();
+  const { t } = await getCurrentMessages();
 
   return (
     <main>
       <section className="hero">
         <div>
           <p className="eyebrow">Firecrawl x AI Workflow</p>
-          <h1>Parse documents into a workspace, not a dead blob.</h1>
-          <p>
-            Upload contracts, reports, policies, and spreadsheets. Parse them with Firecrawl, review the markdown,
-            extract key facts, and export clean artifacts for downstream work.
-          </p>
+          <h1>{t.appName}</h1>
+          <p>{t.appTagline}</p>
           <div className="cta-row">
             {user ? (
               <>
                 <Link className="primary-button" href="/documents/new">
-                  Create first document
+                  {t.nav.newDocument}
                 </Link>
                 <Link className="ghost-button" href="/dashboard">
-                  Open dashboard
+                  {t.nav.dashboard}
                 </Link>
               </>
             ) : (
               <>
                 <Link className="primary-button" href="/auth/register">
-                  Create workspace account
+                  {t.nav.register}
                 </Link>
                 <Link className="ghost-button" href="/auth/login">
-                  Sign in
+                  {t.nav.signIn}
                 </Link>
               </>
             )}
