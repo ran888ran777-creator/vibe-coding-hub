@@ -1,0 +1,35 @@
+{{ define "main" }}
+  <article class="article">
+    <header class="page-head">
+      <p class="eyebrow">{{ .Section | title }}</p>
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}
+      <div class="meta-row">
+        <span>{{ .Date.Format "02.01.2006" }}</span>
+        <span>Сложность: <strong>{{ .Params.difficulty | default "beginner" }}</strong></span>
+        <span>Категория: <strong>{{ .Params.category | default .Section }}</strong></span>
+        {{ with .GitInfo }}<span>Обновлено: {{ .AuthorDate.Format "02.01.2006" }}</span>{{ end }}
+      </div>
+      <div class="tag-row">
+        {{ range .Params.tags }}
+          <span class="tag">{{ . }}</span>
+        {{ end }}
+      </div>
+    </header>
+
+    <div class="content" data-pagefind-body>
+      {{ .Content }}
+    </div>
+
+    <nav class="pager" aria-label="Навигация по материалам">
+      {{ with .PrevInSection }}
+        <a class="pager-link" href="{{ .RelPermalink }}">← {{ .Title }}</a>
+      {{ else }}
+        <span></span>
+      {{ end }}
+      {{ with .NextInSection }}
+        <a class="pager-link align-right" href="{{ .RelPermalink }}">{{ .Title }} →</a>
+      {{ end }}
+    </nav>
+  </article>
+{{ end }}

@@ -1,0 +1,32 @@
+{{ define "main" }}
+  <section class="page-head">
+    <p class="eyebrow">Раздел</p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}
+  </section>
+
+  {{ $pages := .RegularPages.ByWeight }}
+  {{ if gt (len $pages) 0 }}
+    <section class="card-grid">
+      {{ range $pages }}
+        <article class="card">
+          <div class="card-topline">
+            <span class="difficulty difficulty-{{ .Params.difficulty | default `beginner` }}">{{ .Params.difficulty | default "beginner" }}</span>
+            <span class="weight">Вес: {{ .Params.weight | default 100 }}</span>
+          </div>
+          <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+          <p>{{ .Description | default .Summary }}</p>
+          <div class="tag-row">
+            {{ range .Params.tags }}
+              <span class="tag">{{ . }}</span>
+            {{ end }}
+          </div>
+        </article>
+      {{ end }}
+    </section>
+  {{ else }}
+    <section class="empty-state">
+      <p>Пока здесь нет отдельных статей. Используйте навигацию выше или начните с главной страницы.</p>
+    </section>
+  {{ end }}
+{{ end }}

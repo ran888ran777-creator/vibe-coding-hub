@@ -1,0 +1,59 @@
+{{ define "main" }}
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Hugo x AI Workflow</p>
+      <h1>Vibe Coding Hub</h1>
+      <p class="lead">Русскоязычная база знаний о статических сайтах, агентных процессах, MCP и прикладной инженерии вокруг AI.</p>
+      <div class="hero-actions">
+        <a class="button" href="{{ "guides/" | relURL }}">Открыть гайды</a>
+        <a class="button button-secondary" href="{{ "tools/claude-code/" | relURL }}">Изучить Claude Code</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <h2>Что внутри</h2>
+      <ul class="feature-list">
+        <li>Hugo-структура без внешних UI-зависимостей</li>
+        <li>Подготовка к Pagefind без переписывания шаблонов</li>
+        <li>Тёмная тема по умолчанию и адаптивная вёрстка</li>
+        <li>GitHub Pages deploy через Actions</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <p class="eyebrow">Разделы</p>
+      <h2>Навигация по хабу</h2>
+    </div>
+    <div class="card-grid">
+      {{ range site.Params.sections }}
+        {{ $page := site.GetPage (printf "/%s" .) }}
+        {{ if $page }}
+          <article class="card">
+            <h3><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
+            <p>{{ $page.Description }}</p>
+          </article>
+        {{ end }}
+      {{ end }}
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <p class="eyebrow">Недавнее</p>
+      <h2>Последние материалы</h2>
+    </div>
+    <div class="card-grid">
+      {{ range first 6 (where site.RegularPages "Section" "in" (slice "concepts" "skills" "models" "mcp" "guides" "tools")).ByDate.Reverse }}
+        <article class="card">
+          <div class="card-topline">
+            <span class="tag">{{ .Section }}</span>
+            <span class="weight">{{ .Date.Format "02.01.2006" }}</span>
+          </div>
+          <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+          <p>{{ .Description | default .Summary }}</p>
+        </article>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}

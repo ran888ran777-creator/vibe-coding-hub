@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ran888ran777-creator.github.io/vibe-coding-hub/sitemap.xml

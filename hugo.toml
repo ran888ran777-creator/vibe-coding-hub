@@ -1,0 +1,47 @@
+baseURL = "https://ran888ran777-creator.github.io/vibe-coding-hub/"
+languageCode = "ru"
+title = "Vibe Coding Hub"
+defaultContentLanguage = "ru"
+enableGitInfo = true
+relativeURLs = true
+disableKinds = ["taxonomy", "term"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = false
+    style = "monokai"
+
+[params]
+  darkMode = true
+  repoURL = "https://github.com/ran888ran777-creator/vibe-coding-hub"
+  description = "Русскоязычный хаб по Hugo, AI-воркфлоу, MCP, навыкам и вайб-кодингу."
+  sections = ["concepts", "skills", "models", "mcp", "guides"]
+
+[menu]
+  [[menu.main]]
+    name = "Концепты"
+    pageRef = "/concepts"
+    weight = 10
+  [[menu.main]]
+    name = "Навыки"
+    pageRef = "/skills"
+    weight = 20
+  [[menu.main]]
+    name = "Модели"
+    pageRef = "/models"
+    weight = 30
+  [[menu.main]]
+    name = "MCP"
+    pageRef = "/mcp"
+    weight = 40
+  [[menu.main]]
+    name = "Гайды"
+    pageRef = "/guides"
+    weight = 50
+  [[menu.main]]
+    name = "Claude Code"
+    pageRef = "/tools/claude-code"
+    weight = 60
