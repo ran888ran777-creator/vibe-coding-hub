@@ -39,8 +39,16 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Build site
         run: hugo --minify
+
+      - name: Build Pagefind index
+        run: npx -y pagefind --site public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
