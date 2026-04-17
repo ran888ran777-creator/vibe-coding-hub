@@ -14,9 +14,16 @@ Production-minded MVP for document parsing on top of Firecrawl Document Parsing.
 
 1. Copy `.env.example` to `.env`.
 2. Install dependencies: `npm install`
-3. Generate Prisma client: `npm run prisma:generate`
-4. Apply migrations once schema is finalized: `npm run prisma:migrate`
-5. Start dev server: `npm run dev`
+3. Start local Postgres: `npm run db:up`
+4. Generate Prisma client: `npm run prisma:generate`
+5. Apply migrations: `npm run prisma:migrate`
+6. Start dev server: `npm run dev`
+
+## Local MVP mode
+
+- When `DEV_USE_MOCK_SERVICES=true`, document parsing, summaries, and Q&A still work without Firecrawl/OpenAI keys.
+- URL mode works immediately in mock mode.
+- File uploads also work in mock mode using a local fallback storage path.
 
 ## Notes
 

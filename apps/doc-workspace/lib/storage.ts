@@ -1,3 +1,5 @@
+import path from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/lib/env";
@@ -20,9 +22,24 @@ function getStorageClient() {
 }
 
 export async function uploadFileToStorage(file: File) {
-  const client = getStorageClient();
   const key = `documents/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
   const arrayBuffer = await file.arrayBuffer();
+
+  if (!env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY || !env.R2_BUCKET) {
+    if (!env.DEV_USE_MOCK_SERVICES) {
+      throw new Error("Storage is not configured. Set R2_* env vars.");
+    }
+
+    const outputPath = path.join(process.cwd(), ".local-storage", key);
+    await mkdir(path.dirname(outputPath), { recursive: true });
+    await writeFile(outputPath, Buffer.from(arrayBuffer));
+    return {
+      key,
+      publicUrl: `local://${key}`
+    };
+  }
+
+  const client = getStorageClient();
 
   await client.send(
     new PutObjectCommand({
@@ -38,6 +55,17 @@ export async function uploadFileToStorage(file: File) {
 }
 
 export async function createSignedUploadUrl(fileName: string, contentType: string) {
+  if (!env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY || !env.R2_BUCKET) {
+    if (!env.DEV_USE_MOCK_SERVICES) {
+      throw new Error("Storage is not configured. Set R2_* env vars.");
+    }
+
+    return {
+      key: `documents/${Date.now()}-${fileName.replace(/\s+/g, "-")}`,
+      uploadUrl: "local-mock-upload"
+    };
+  }
+
   const client = getStorageClient();
   const key = `documents/${Date.now()}-${fileName.replace(/\s+/g, "-")}`;
 

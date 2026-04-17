@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
+  DEV_USE_MOCK_SERVICES: z.coerce.boolean().default(false),
   FIRECRAWL_API_KEY: z.string().optional(),
   FIRECRAWL_BASE_URL: z.string().default("https://api.firecrawl.dev"),
   OPENAI_API_KEY: z.string().optional(),
@@ -17,6 +18,7 @@ const envSchema = z.object({
 
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
+  DEV_USE_MOCK_SERVICES: process.env.DEV_USE_MOCK_SERVICES,
   FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
   FIRECRAWL_BASE_URL: process.env.FIRECRAWL_BASE_URL,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,

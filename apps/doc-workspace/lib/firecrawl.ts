@@ -13,6 +13,28 @@ type FirecrawlResponse = {
 
 export async function parseDocumentFromUrl(url: string, mimeType?: string) {
   if (!env.FIRECRAWL_API_KEY) {
+    if (env.DEV_USE_MOCK_SERVICES) {
+      return {
+        raw: {
+          source: "mock-firecrawl",
+          url,
+          mimeType
+        },
+        markdown: `# Mock parse\n\nSource: ${url}\n\nThis document was parsed in local mock mode.\n\n## Key sections\n\n- Input URL or uploaded file was accepted\n- Firecrawl API key is not configured\n- Replace mock mode with a real key to get production parsing\n`,
+        metadata: {
+          source: "mock-firecrawl",
+          mimeType: mimeType ?? "unknown",
+          url
+        },
+        tables: [
+          [
+            { column: "field", value: "status" },
+            { column: "value", value: "mocked" }
+          ]
+        ]
+      };
+    }
+
     throw new Error("FIRECRAWL_API_KEY is missing.");
   }
 
