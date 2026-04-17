@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(cuid())
+  email      String     @unique
+  name       String?
+  documents  Document[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Document {
+  id             String             @id @default(cuid())
+  userId         String
+  title          String
+  status         DocumentStatus     @default(UPLOADED)
+  sourceType     DocumentSourceType
+  mimeType       String?
+  originalName   String?
+  externalUrl    String?
+  storageKey     String?
+  pageCount      Int?
+  firecrawlJobId String?
+  lastError      String?
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parse          DocumentParse?
+  summaries      DocumentSummary[]
+  exports        DocumentExport[]
+  qaMessages     DocumentQAMessage[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model DocumentParse {
+  id           String    @id @default(cuid())
+  documentId   String    @unique
+  rawJson      Json
+  markdown     String?
+  metadataJson Json?
+  tablesJson   Json?
+  language     String?
+  parsedAt     DateTime?
+  document     Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model DocumentSummary {
+  id           String      @id @default(cuid())
+  documentId   String
+  kind         SummaryKind
+  content      String
+  keyFactsJson Json?
+  createdAt    DateTime    @default(now())
+  document     Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, kind])
+}
+
+model DocumentExport {
+  id         String       @id @default(cuid())
+  documentId String
+  format     ExportFormat
+  storageKey String
+  createdAt  DateTime     @default(now())
+  document   Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model DocumentQAMessage {
+  id         String      @id @default(cuid())
+  documentId String
+  role       MessageRole
+  content    String
+  createdAt  DateTime    @default(now())
+  document   Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, createdAt])
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PARSING
+  PARSED
+  SUMMARIZING
+  READY
+  FAILED
+}
+
+enum DocumentSourceType {
+  FILE
+  URL
+}
+
+enum SummaryKind {
+  OVERVIEW
+  KEY_FACTS
+  ACTION_ITEMS
+}
+
+enum ExportFormat {
+  MARKDOWN
+  JSON
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
